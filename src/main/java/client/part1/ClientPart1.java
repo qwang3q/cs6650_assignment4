@@ -27,11 +27,11 @@ public class ClientPart1 {
 
         // Define phases
         this.phase1 = new Phase(this.numThreads / 4, this.numRuns / 10,
-            this.numSkiers, 0, 90, this.numLifts, basePath, this.traceLatency);
+            this.numSkiers, 0, 90, this.numLifts, basePath, this.traceLatency, false);
         this.phase2 = new Phase(this.numThreads, this.numRuns * 8 / 10,
-            this.numSkiers,91, 360, this.numLifts, basePath, this.traceLatency);
+            this.numSkiers,91, 360, this.numLifts, basePath, this.traceLatency, false);
         this.phase3 = new Phase(this.numThreads / 4, this.numRuns / 10,
-            this.numSkiers, 361, 420, this.numLifts, basePath, this.traceLatency);
+            this.numSkiers, 361, 420, this.numLifts, basePath, this.traceLatency, true);
     }
 
     public ClientPart1(int numThreads, int numRuns, int numSkiers, int numLifts, String basePath) {

@@ -1,5 +1,7 @@
 package client.part1;
 
+import org.apache.log4j.Logger;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -13,6 +15,8 @@ import io.swagger.client.api.SkiersApi;
 import io.swagger.client.model.LiftRide;
 
 public class Phase {
+    final static Logger logger = Logger.getLogger(Phase.class);
+
     public ExecutorService workerThreadsPool;
     private CountDownLatch latch;
     private CountDownLatch tenPercentLatch;
@@ -28,9 +32,11 @@ public class Phase {
     private ConcurrentHashMap<String, RequestRecord> records = new ConcurrentHashMap<>();
     private String basePath;
     private boolean traceLatency;
+    private boolean sendGetRequest;
+    private final int MAXRETRY = 10;
 
     public Phase(int numThreads, int numRuns, int numSkiers, int startTime, int endTime,
-                 int numLifts, String basePath, boolean traceLatency) {
+                 int numLifts, String basePath, boolean traceLatency, boolean sendGetRequest) {
         this.numThreads = numThreads;
         this.numRuns = numRuns;
         this.numSkiers = numSkiers;
@@ -44,6 +50,7 @@ public class Phase {
         this.workerThreadsPool = Executors.newFixedThreadPool(numThreads);
         this.latch = new CountDownLatch(numThreads);
         this.tenPercentLatch = new CountDownLatch(numThreads/10);
+        this.sendGetRequest = sendGetRequest;
     }
 
     public void addRecord(long startTime, String requestType, long latency, int responseCode) {
@@ -51,12 +58,12 @@ public class Phase {
             latency, responseCode));
     }
 
-    public synchronized void incFailedCount() {
-        this.totalFailedCount++;
+    public synchronized void incFailedCount(int incr) {
+        this.totalFailedCount += incr;
     }
 
-    public synchronized void incTotalCount() {
-        this.totalRequests++;
+    public synchronized void incTotalCount(int incr) {
+        this.totalRequests += incr;
     }
 
     public ConcurrentHashMap<String, RequestRecord>  getRecords() {
@@ -72,43 +79,119 @@ public class Phase {
     }
 
     public void start() {
+//        System.out.println("Start phase at: " + String.valueOf(System.currentTimeMillis()));
         for(int i = 0; i < this.numThreads; i++) {
             int[] boundaries = getBoundaries(numSkiers, numThreads, i);
             Runnable runner = () -> {
-                    SkiersApi apiInstance = new SkiersApi();
-                    ApiClient client = apiInstance.getApiClient();
-                    client.setBasePath(this.basePath);
+                int totalCount = 0;
+                int failedCount = 0;
+                SkiersApi apiInstance = new SkiersApi();
+                ApiClient client = apiInstance.getApiClient();
+                client.setBasePath(this.basePath);
 
-                    for(int j = 0; j < this.numRequests; j++) {
-                        LiftRide liftRide = new LiftRide();
-                        int startTime = ThreadLocalRandom.current().nextInt(this.startTime,
-                            this.endTime + 1);
-                        liftRide.setTime(startTime);
-                        liftRide.setLiftID(ThreadLocalRandom.current().nextInt(this.numLifts) + 1);
-                        int skierId = ThreadLocalRandom.current().nextInt(boundaries[0],
-                            boundaries[1] + 1);
-                        long postStartTime = 0;
-                        if (this.traceLatency) {
-                            postStartTime = System.currentTimeMillis();
-                        }
-                        int responseCode = 201;
+                for(int j = 0; j < this.numRequests; j++) {
+                    LiftRide liftRide = new LiftRide();
+                    int rideStartTime = ThreadLocalRandom.current().nextInt(this.startTime,
+                        this.endTime + 1);
+                    liftRide.setTime(rideStartTime);
+                    liftRide.setLiftID(ThreadLocalRandom.current().nextInt(this.numLifts) + 1);
+                    int skierId = ThreadLocalRandom.current().nextInt(boundaries[0],
+                        boundaries[1] + 1);
+                    long postStartTime = 0;
+                    if (this.traceLatency) {
+                        postStartTime = System.currentTimeMillis();
+                    }
+                    int responseCode = 201;
+
+
+
+                    boolean inserted = false;
+                    int count = 0;
+                    while (!inserted && count < this.MAXRETRY) {
                         try{
+                            count++;
                             ApiResponse response = apiInstance.writeNewLiftRideWithHttpInfo(
                                 liftRide, 1, "2019", "1", skierId);
                             responseCode = response.getStatusCode();
-                        } catch (ApiException e) {
-                            this.incFailedCount();
-                            responseCode = e.getCode();
-                        } finally {
-                            if (this.traceLatency) {
-                                addRecord(postStartTime, "post",
-                                    System.currentTimeMillis() - postStartTime, responseCode);
+                            if (this.sendGetRequest) {
+                                apiInstance.getSkierDayVertical(1, "2019", "1", skierId);
                             }
-                            this.incTotalCount();
+                            inserted = true;
+                        } catch (ApiException e) {
+//                            failedCount++;
+                              responseCode = e.getCode();
+//                        logger.error("request failed at: " +  String.valueOf(System.currentTimeMillis()) + "  " + e.getMessage());
+//                            inserted = false;
                         }
                     }
-                    this.tenPercentLatch.countDown();
-                    this.latch.countDown();
+
+                    if (this.traceLatency) {
+                        addRecord(postStartTime, "post",
+                            System.currentTimeMillis() - postStartTime, responseCode);
+                    }
+                    totalCount++;
+                    if (!inserted) {
+                        failedCount++;
+                    }
+
+
+
+
+
+
+
+//                    try{
+//                        ApiResponse response = apiInstance.writeNewLiftRideWithHttpInfo(
+//                            liftRide, 1, "2019", "1", skierId);
+//                        responseCode = response.getStatusCode();
+//                        if (this.sendGetRequest) {
+//                            apiInstance.getSkierDayVertical(1, "2019", "1", skierId);
+//                        }
+//                    } catch (ApiException e) {
+//                        failedCount++;
+////                        responseCode = e.getCode();
+////                        logger.error("request failed: " + e.getMessage());
+//
+//                    } finally {
+//                        if (this.traceLatency) {
+//                            addRecord(postStartTime, "post",
+//                                System.currentTimeMillis() - postStartTime, responseCode);
+//                        }
+//                        totalCount++;
+//                    }
+
+
+//
+//                    boolean inserted = false;
+//                    while (!inserted) {
+//                        try{
+//                            ApiResponse response = apiInstance.writeNewLiftRideWithHttpInfo(
+//                                liftRide, 1, "2019", "1", skierId);
+//                            responseCode = response.getStatusCode();
+//                            if (this.sendGetRequest) {
+//                                apiInstance.getSkierDayVertical(1, "2019", "1", skierId);
+//                            }
+//                            inserted = true;
+//                            if (this.traceLatency) {
+//                                addRecord(postStartTime, "post",
+//                                    System.currentTimeMillis() - postStartTime, responseCode);
+//                            }
+//                            totalCount++;
+//                        } catch (ApiException e) {
+//                            inserted = false;
+////                            failedCount++;
+////                        responseCode = e.getCode();
+////                        logger.error("request failed: " + e.getMessage());
+//
+//                        }
+//                    }
+
+
+                }
+                this.tenPercentLatch.countDown();
+                this.latch.countDown();
+                this.incFailedCount(failedCount);
+                this.incTotalCount(totalCount);
             };
             this.workerThreadsPool.submit(runner);
         }

@@ -12,6 +12,14 @@
         <servlet-name>ResortServlet</servlet-name>
         <servlet-class>server.ResortServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>StatServlet</servlet-name>
+        <servlet-class>server.StatServlet</servlet-class>
+    </servlet>
+
+    <listener>
+        <listener-class>server.StatisticOperator</listener-class>
+    </listener>
 
     <servlet-mapping>
         <servlet-name>SkierServlet</servlet-name>
@@ -20,5 +28,9 @@
     <servlet-mapping>
         <servlet-name>ResortServlet</servlet-name>
         <url-pattern>/resorts/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StatServlet</servlet-name>
+        <url-pattern>/statistics/*</url-pattern>
     </servlet-mapping>
 </web-app>
