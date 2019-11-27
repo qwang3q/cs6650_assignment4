@@ -102,9 +102,6 @@ public class Phase {
                         postStartTime = System.currentTimeMillis();
                     }
                     int responseCode = 201;
-
-
-
                     boolean inserted = false;
                     int count = 0;
                     while (!inserted && count < this.MAXRETRY) {
@@ -133,60 +130,6 @@ public class Phase {
                     if (!inserted) {
                         failedCount++;
                     }
-
-
-
-
-
-
-
-//                    try{
-//                        ApiResponse response = apiInstance.writeNewLiftRideWithHttpInfo(
-//                            liftRide, 1, "2019", "1", skierId);
-//                        responseCode = response.getStatusCode();
-//                        if (this.sendGetRequest) {
-//                            apiInstance.getSkierDayVertical(1, "2019", "1", skierId);
-//                        }
-//                    } catch (ApiException e) {
-//                        failedCount++;
-////                        responseCode = e.getCode();
-////                        logger.error("request failed: " + e.getMessage());
-//
-//                    } finally {
-//                        if (this.traceLatency) {
-//                            addRecord(postStartTime, "post",
-//                                System.currentTimeMillis() - postStartTime, responseCode);
-//                        }
-//                        totalCount++;
-//                    }
-
-
-//
-//                    boolean inserted = false;
-//                    while (!inserted) {
-//                        try{
-//                            ApiResponse response = apiInstance.writeNewLiftRideWithHttpInfo(
-//                                liftRide, 1, "2019", "1", skierId);
-//                            responseCode = response.getStatusCode();
-//                            if (this.sendGetRequest) {
-//                                apiInstance.getSkierDayVertical(1, "2019", "1", skierId);
-//                            }
-//                            inserted = true;
-//                            if (this.traceLatency) {
-//                                addRecord(postStartTime, "post",
-//                                    System.currentTimeMillis() - postStartTime, responseCode);
-//                            }
-//                            totalCount++;
-//                        } catch (ApiException e) {
-//                            inserted = false;
-////                            failedCount++;
-////                        responseCode = e.getCode();
-////                        logger.error("request failed: " + e.getMessage());
-//
-//                        }
-//                    }
-
-
                 }
                 this.tenPercentLatch.countDown();
                 this.latch.countDown();

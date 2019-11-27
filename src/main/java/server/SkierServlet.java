@@ -27,8 +27,8 @@ public class SkierServlet extends HttpServlet {
         liftRidesDao = LiftRidesDao.getInstance();
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse res) throws ServletException, IOException {
-        String recordPath = (String)getServletContext().getAttribute("skierPostStatPath");
-        long startTime = System.currentTimeMillis();
+//        String recordPath = (String)getServletContext().getAttribute("skierPostStatPath");
+//        long startTime = System.currentTimeMillis();
 
         BufferedReader reader = request.getReader();
         String jsonString = "";
@@ -70,17 +70,17 @@ public class SkierServlet extends HttpServlet {
             }
         }
 
-        try {
-            logger.info("writing file");
-            Stat.appendFile(recordPath, System.currentTimeMillis() - startTime);
-        } catch (IOException ioExp) {
-            logger.error(ioExp);
-        }
+//        try {
+//            logger.info("writing file");
+//            Stat.appendFile(recordPath, System.currentTimeMillis() - startTime);
+//        } catch (IOException ioExp) {
+//            logger.error(ioExp);
+//        }
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        String recordPath = (String)getServletContext().getAttribute("skierGetStatPath");
-        long startTime = System.currentTimeMillis();
+//        String recordPath = (String)getServletContext().getAttribute("skierGetStatPath");
+//        long startTime = System.currentTimeMillis();
 
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
@@ -123,12 +123,12 @@ public class SkierServlet extends HttpServlet {
             res.getWriter().write("{\"message\": \"not found\"}");
         }
 
-        try {
-            logger.info("writing file");
-            Stat.appendFile(recordPath, System.currentTimeMillis() - startTime);
-        } catch (IOException ioExp) {
-            logger.error(ioExp);
-        }
+//        try {
+//            logger.info("writing file");
+//            Stat.appendFile(recordPath, System.currentTimeMillis() - startTime);
+//        } catch (IOException ioExp) {
+//            logger.error(ioExp);
+//        }
     }
 
 

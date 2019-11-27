@@ -3,7 +3,6 @@ package server;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.UUID;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,10 +12,6 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-
-import databaseUtils.ResortsDao;
 import databaseUtils.StatsDao;
 
 public class StatisticOperator implements ServletContextListener {

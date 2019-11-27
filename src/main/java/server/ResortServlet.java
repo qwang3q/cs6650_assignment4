@@ -27,8 +27,8 @@ public class ResortServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        String recordPath = (String)getServletContext().getAttribute("resortPostStatPath");
-        long startTime = System.currentTimeMillis();
+//        String recordPath = (String)getServletContext().getAttribute("resortPostStatPath");
+//        long startTime = System.currentTimeMillis();
         BufferedReader reader = req.getReader();
         String jsonString = "";
         try {
@@ -71,17 +71,17 @@ public class ResortServlet extends HttpServlet {
             }
         }
 
-        try {
-            logger.info("writing file");
-            Stat.appendFile(recordPath, System.currentTimeMillis() - startTime);
-        } catch (IOException ioExp) {
-            logger.error(ioExp);
-        }
+//        try {
+//            logger.info("writing file");
+//            Stat.appendFile(recordPath, System.currentTimeMillis() - startTime);
+//        } catch (IOException ioExp) {
+//            logger.error(ioExp);
+//        }
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        String recordPath = (String)getServletContext().getAttribute("resortGetStatPath");
-        long startTime = System.currentTimeMillis();
+//        String recordPath = (String)getServletContext().getAttribute("resortGetStatPath");
+//        long startTime = System.currentTimeMillis();
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         String urlPath = req.getPathInfo();
@@ -116,12 +116,12 @@ public class ResortServlet extends HttpServlet {
             res.getWriter().write("{\"message\": \"not found\"}");
         }
 
-        try {
-            logger.info("writing file");
-            Stat.appendFile(recordPath, System.currentTimeMillis() - startTime);
-        } catch (IOException ioExp) {
-            logger.error(ioExp);
-        }
+//        try {
+//            logger.info("writing file");
+//            Stat.appendFile(recordPath, System.currentTimeMillis() - startTime);
+//        } catch (IOException ioExp) {
+//            logger.error(ioExp);
+//        }
     }
 
     private boolean isUrlValid(String urlPath) {

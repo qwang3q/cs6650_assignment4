@@ -27,17 +27,12 @@ public class Main {
 
         // Local host
 //        String basePath = "http://127.0.0.1:8080/WEB_APP";
-        // Single EC2 server.
-//        String basePath = "http://34.219.254.7:8080/assignment2_war";
 
-        // Single EC2 server cs6650-2.
-//        String basePath = "http://54.70.82.246:8080/assignment2_war";
+        // Single EC2 server cs6650-6.
+        String basePath = "http://34.221.22.25:8080/assignment2_war";
 
         // Load balancer
-//        String basePath = "http://test-balancer-1252926253.us-west-2.elb.amazonaws.com:8080/assignment2_war";
-//        String basePath = "http://test567-2103843735.us-west-2.elb.amazonaws.com:8080/assignment2_war";
-
-        String basePath = "http://ski-478715600.us-west-2.elb.amazonaws.com:80/assignment2_war";
+//        String basePath = "http://ski-478715600.us-west-2.elb.amazonaws.com:80/assignment2_war";
 
 
 //        int[] numThreadArray = new int[] {32, 64, 128, 256};
